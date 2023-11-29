@@ -52,8 +52,14 @@ cleaned = total_merge %>%
   rename(gender = RIAGENDR, age = RIDAGEYR, race = RIDRETH3, 
          total_cholesterol = LBXTC, insurance = HIQ011) %>%
   mutate(gender = as.factor(gender), insurance = as.factor(insurance),
-         race = as.factor(race))
+         race = as.factor(race), coverage = as.factor(coverage))
 
+dim(cleaned)
+str(cleaned)
+structure(cleaned)
+
+mean(cleaned$total_cholesterol)
+sd(cleaned$total_cholesterol) / sqrt(nrow(cleaned))
 
 ## Factorial ANOVA
 
@@ -66,7 +72,10 @@ result = leveneTest(log(total_cholesterol) ~ interaction(race, coverage),
 result
 
 # 2-Way ANOVA
-model = anova(lm(log(total_cholesterol) ~ race*coverage, data = cleaned))
-model
+model = aov(lm(log(total_cholesterol) ~ race*coverage, data = cleaned))
+summary(model)
 
-
+# Post-hoc tests
+race_tukey = TukeyHSD(model, "race")
+TukeyHSD(model, "coverage")
+plot(race_tukey)
